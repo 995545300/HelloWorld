@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.yingxiangxinxi.dao.HuaYuanXinXiDao">
+    
+	<sql id="huaYuanXinXiColumns">
+		a.id AS "id",
+		a.collectionid AS "collectionid",
+		a.name AS "name",
+		a.smallimg AS "smallimg",
+		a.paishejiaodu AS "paishejiaodu",
+		a.guige AS "guige",
+		a.zhizuoren AS "zhizuoren",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="huaYuanXinXiJoins">
+	</sql>
+	
+    
+	<select id="get" resultType="HuaYuanXinXi" >
+		SELECT 
+			<include refid="huaYuanXinXiColumns"/>
+		FROM huayuan_xinxi a
+		<include refid="huaYuanXinXiJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="HuaYuanXinXi" >
+		SELECT 
+			<include refid="huaYuanXinXiColumns"/>
+		FROM huayuan_xinxi a
+		<include refid="huaYuanXinXiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="paishejiaodu != null and paishejiaodu != ''">
+				AND a.paishejiaodu = #{paishejiaodu}
+			</if>
+			<if test="zhizuoren != null and zhizuoren != ''">
+				AND a.zhizuoren = #{zhizuoren}
+			</if>
+			<if test="collectionid != null and collectionid != ''">
+				AND a.collectionid = #{collectionid}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="HuaYuanXinXi" >
+		SELECT 
+			<include refid="huaYuanXinXiColumns"/>
+		FROM huayuan_xinxi a
+		<include refid="huaYuanXinXiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO huayuan_xinxi(
+			id,
+			collectionid,
+			name,
+			smallimg,
+			paishejiaodu,
+			guige,
+			zhizuoren,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{collectionid},
+			#{name},
+			#{smallimg},
+			#{paishejiaodu},
+			#{guige},
+			#{zhizuoren},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE huayuan_xinxi SET 	
+			name = #{name},
+			smallimg =#{smallimg},
+			paishejiaodu = #{paishejiaodu},
+			guige = #{guige},
+			zhizuoren = #{zhizuoren},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM huayuan_xinxi
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE huayuan_xinxi SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="HuaYuanXinXi" statementType="STATEMENT">
+		select * FROM huayuan_xinxi  where ${propertyName} = '${value}'
+	</select>
+	
+	
+	<select id="findCountByCollectionId" resultType="java.lang.Integer" >
+		SELECT 
+			count(a.id)
+		FROM huayuan_xinxi a
+		<include refid="huaYuanXinXiJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="collectionid != null and collectionid != ''">
+				AND a.collectionid = #{collectionid}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getImgurl" resultType="String">
+		select name from huayuan_xinxi where collectionid=#{id} and paishejiaodu ='A' order by create_date asc limit 1
+	</select>
+	
+	<select id="getXinxinum" resultType="String">
+		select count(id) from huayuan_xinxi where collectionid=#{id} 
+	</select>
+	
+</mapper>

@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeeplus.modules.huanycollection.dao.HuaYCollectionDao">
+    
+	<sql id="huaYCollectionColumns">
+		a.id AS "id",
+		a.datastatus AS "datastatus",
+		a.code AS "code",
+		a.registercode AS "registercode",
+		a.collectionname AS "collectionname",
+		a.name AS "name",
+		a.classone AS "classone",
+		a.classtwo AS "classtwo",
+		a.classthree AS "classthree",
+		a.createyear AS "createyear",
+		a.characterway AS "characterway",
+		a.measure AS "measure",
+		a.author AS "author",
+		a.workway AS "workway",
+		a.morphologicalshape AS "morphologicalshape",
+		a.method AS "method",
+		a.autograph AS "autograph",
+		a.inscriptions AS "inscriptions",
+		a.preface AS "preface",
+		a.epigraph AS "epigraph",
+		a.titlepiece AS "titlepiece",
+		a.publicseal AS "publicseal",
+		a.mass AS "mass",
+		a.massnote AS "massnote",
+		a.degreeofresidual AS "degreeofresidual",
+		a.degreeofresidualnote AS "degreeofresidualnote",
+		a.savestatus AS "savestatus",
+		a.num AS "num",
+		a.source AS "source",
+		a.incollectiondate AS "incollectiondate",
+		a.copyright AS "copyrights",
+		a.copyrightsecond AS "copyrightsecond",
+		a.mark AS "mark",
+		a.unitcode AS "unitcode",
+		a.inputname AS "inputname",
+		a.inputtime AS "inputtime",
+		a.checkname AS "checkname",
+		a.checktime AS "checktime",
+		a.backreason AS "backreason",
+		a.collectorganization AS "collectorganization",
+		a.kufang_id AS "kufang.id",
+		a.isinkufang AS "isinkufang",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.del_flag AS "delFlag",
+		a.collectionFile AS "collectionFile",
+		a.remarks AS "remarks",
+		copyright.name AS "copyright.name",
+		kufang.name AS "kufang.name",
+		xinxi.smallimg AS "xinxi.smallimg",
+		xinxi.name AS "xinxi.name",
+		xinxi.collectionid AS "xinxi.collectionid"
+	</sql>
+	
+	<sql id="huaYCollectionJoins">
+		LEFT JOIN huayuan_copyright copyright ON copyright.name = a.copyright
+		LEFT JOIN huayuan_kufang kufang ON kufang.id = a.kufang_id
+		LEFT JOIN (select * from huayuan_xinxi  h where not exists (select 1 from (select  * from huayuan_xinxi x where paishejiaodu="A") AS x where h.collectionid = collectionid AND create_date > h.create_date) AND paishejiaodu="A") xinxi ON xinxi.collectionid = a.id 
+		
+	</sql>
+	
+    
+	<select id="get" resultType="HuaYCollection" >
+		SELECT 
+			<include refid="huaYCollectionColumns"/>
+		FROM huayuan_collection a
+		<include refid="huaYCollectionJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	<select id="getNum" resultType="int" >
+		SELECT count(id) FROM huayuan_collection;
+	</select>
+	<select id="getNumNoDel" resultType="int" >
+		SELECT count(id) FROM huayuan_collection a
+		<where>
+			a.del_flag = 0  
+		</where>
+	</select>
+	<select id="getNumInKuFang" resultType="int" >
+		SELECT count(id) FROM huayuan_collection a
+		<where>
+			a.del_flag = 0 AND isinkufang="1" 
+		</where>
+	</select>
+	<select id="getNumOutKuFang" resultType="int" >
+		SELECT count(id) FROM huayuan_collection a
+		<where>
+			a.del_flag = 0 AND isinkufang="0" 
+		</where>
+	</select>
+	
+	<select id="findList" resultType="HuaYCollection" >
+		SELECT 
+			<include refid="huaYCollectionColumns"/>
+		FROM huayuan_collection a
+		<include refid="huaYCollectionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="code != null and code != ''">
+				AND a.code LIKE 
+					<if test="dbName == 'oracle'">'%'||#{code}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{code}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{code},'%')</if>
+			</if>
+			<if test="collectionname != null and collectionname != ''">
+				AND a.collectionname LIKE 
+					<if test="dbName == 'oracle'">'%'||#{collectionname}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{collectionname}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{collectionname},'%')</if>
+			</if>
+			<if test="classone != null and classone != ''">
+				AND a.classone LIKE 
+					<if test="dbName == 'oracle'">'%'||#{classone}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{classone}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{classone},'%')</if>
+			</if>
+			<if test="classtwo != null and classtwo != ''">
+				AND a.classtwo LIKE 
+					<if test="dbName == 'oracle'">'%'||#{classtwo}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{classtwo}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{classtwo},'%')</if>
+			</if>
+			<if test="classthree != null and classthree != ''">
+				AND a.classthree LIKE 
+					<if test="dbName == 'oracle'">'%'||#{classthree}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{classthree}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{classthree},'%')</if>
+			</if>
+			<if test="beginIncollectiondate != null and endIncollectiondate != null and beginIncollectiondate != '' and endIncollectiondate != ''">
+				AND a.incollectiondate BETWEEN #{beginIncollectiondate} AND #{endIncollectiondate}
+			</if>
+			<if test="kufang != null and kufang.id != null and kufang.id != ''">
+				AND a.kufang_id = #{kufang.id}
+			</if>
+			<if test="isinkufang != null and isinkufang != null and isinkufang != ''">
+				AND a.isinkufang = #{isinkufang}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="HuaYCollection" >
+		SELECT 
+			<include refid="huaYCollectionColumns"/>
+		FROM huayuan_collection a
+		<include refid="huaYCollectionJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO huayuan_collection(
+			id,
+			datastatus,
+			code,
+			registercode,
+			collectionname,
+			name,
+			classone,
+			classtwo,
+			classthree,
+			createyear,
+			characterway,
+			measure,
+			author,
+			workway,
+			morphologicalshape,
+			method,
+			autograph,
+			inscriptions,
+			preface,
+			epigraph,
+			titlepiece,
+			publicseal,
+			mass,
+			massnote,
+			degreeofresidual,
+			degreeofresidualnote,
+			savestatus,
+			num,
+			source,
+			incollectiondate,
+			copyright,
+			copyrightsecond,
+			mark,
+			unitcode,
+			inputname,
+			inputtime,
+			checkname,
+			checktime,
+			backreason,
+			collectorganization,
+			kufang_id,
+			isinkufang,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			del_flag,
+			collectionFile,
+			remarks
+		) VALUES (
+			#{id},
+			#{datastatus},
+			#{code},
+			#{registercode},
+			#{collectionname},
+			#{name},
+			#{classone},
+			#{classtwo},
+			#{classthree},
+			#{createyear},
+			#{characterway},
+			#{measure},
+			#{author},
+			#{workway},
+			#{morphologicalshape},
+			#{method},
+			#{autograph},
+			#{inscriptions},
+			#{preface},
+			#{epigraph},
+			#{titlepiece},
+			#{publicseal},
+			#{mass},
+			#{massnote},
+			#{degreeofresidual},
+			#{degreeofresidualnote},
+			#{savestatus},
+			#{num},
+			#{source},
+			#{incollectiondate},
+			#{copyrights},
+			#{copyrightsecond},
+			#{mark},
+			#{unitcode},
+			#{inputname},
+			#{inputtime},
+			#{checkname},
+			#{checktime},
+			#{backreason},
+			#{collectorganization},
+			#{kufang.id},
+			#{isinkufang},			
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{delFlag},
+			#{collectionFile},
+			#{remarks}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE huayuan_collection SET 	
+			datastatus = #{datastatus},
+			code = #{code},
+			registercode = #{registercode},
+			collectionname = #{collectionname},
+			name = #{name},
+			classone = #{classone},
+			classtwo = #{classtwo},
+			classthree = #{classthree},
+			createyear = #{createyear},
+			characterway = #{characterway},
+			measure = #{measure},
+			author = #{author},
+			workway = #{workway},
+			morphologicalshape = #{morphologicalshape},
+			method = #{method},
+			autograph = #{autograph},
+			inscriptions = #{inscriptions},
+			preface = #{preface},
+			epigraph = #{epigraph},
+			titlepiece = #{titlepiece},
+			publicseal = #{publicseal},
+			mass = #{mass},
+			massnote = #{massnote},
+			degreeofresidual = #{degreeofresidual},
+			degreeofresidualnote = #{degreeofresidualnote},
+			savestatus = #{savestatus},
+			num = #{num},
+			source = #{source},
+			incollectiondate = #{incollectiondate},
+			copyright = #{copyrights},
+			copyrightsecond = #{copyrightsecond},
+			mark = #{mark},
+			unitcode = #{unitcode},
+			inputname = #{inputname},
+			inputtime = #{inputtime},
+			checkname = #{checkname},
+			checktime = #{checktime},
+			backreason = #{backreason},
+			collectorganization = #{collectorganization},
+			kufang_id = #{kufang.id},
+			isinkufang = #{isinkufang},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			collectionFile = #{collectionFile},
+			remarks = #{remarks}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!--物理删除-->
+	<update id="delete">
+		DELETE FROM huayuan_collection
+		WHERE id = #{id}
+	</update>
+	
+	<!--逻辑删除-->
+	<update id="deleteByLogic">
+		UPDATE huayuan_collection SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+	
+	<!-- 根据实体名称和字段名称和字段值获取唯一记录 -->
+	<select id="findUniqueByProperty" resultType="HuaYCollection" statementType="STATEMENT">
+		select * FROM huayuan_collection  where ${propertyName} = '${value}'
+	</select>
+	
+	<select id="findListBycopyright" resultType="HuayuanCopyright">
+		SELECT 
+			*
+		FROM huayuan_copyright a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+				<if test="dbName == 'oracle'">#{name}||'%'</if>
+				<if test="dbName == 'mssql'">#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat(#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	<select id="findListBykufang" resultType="HuaYuanKuFang">
+		SELECT 
+			*
+		FROM huayuan_kufang a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+				<if test="dbName == 'oracle'">#{name}||'%'</if>
+				<if test="dbName == 'mssql'">#{name}+'%'</if>
+				<if test="dbName == 'mysql'">concat(#{name},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+</mapper>
